@@ -11,9 +11,9 @@ export const LoginPage: React.FC = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  // Default pre-fill with verified working demo credentials so users can log in immediately
-  const [email, setEmail] = useState('admin_demo@iims.com');
-  const [password, setPassword] = useState('Password123!');
+  // Default pre-fill with real verified admin credentials
+  const [email, setEmail] = useState('admin@iims.com');
+  const [password, setPassword] = useState('Admin@123');
   const [preferredRole, setPreferredRole] = useState<UserRole>('ADMIN');
   const [autoRegisterOnFail, setAutoRegisterOnFail] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -93,37 +93,30 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleQuickFill = (demoEmail: string, demoRole: UserRole) => {
-    setEmail(demoEmail);
-    setPassword('Password123!');
-    setPreferredRole(demoRole);
+  const handleQuickFill = (accEmail: string, accPassword: string, accRole: UserRole) => {
+    setEmail(accEmail);
+    setPassword(accPassword);
+    setPreferredRole(accRole);
     setErrorMsg(null);
     setCanAutoRegister(false);
   };
 
-  const handleDirectSignIn = async (demoEmail: string, demoRole: UserRole) => {
-    setEmail(demoEmail);
-    setPassword('Password123!');
-    setPreferredRole(demoRole);
+  const handleDirectSignIn = async (accEmail: string, accPassword: string, accRole: UserRole) => {
+    setEmail(accEmail);
+    setPassword(accPassword);
+    setPreferredRole(accRole);
     setErrorMsg(null);
     setCanAutoRegister(false);
     setIsLoading(true);
 
     try {
-      await login(demoEmail, 'Password123!', demoRole);
-      toast.success('Authentication Successful', `Signed in as ${demoRole} (${demoEmail})`);
+      await login(accEmail, accPassword, accRole);
+      toast.success('Authentication Successful', `Signed in as ${accRole} (${accEmail})`);
       navigate('/dashboard');
     } catch (err: any) {
       console.error('Direct login error', err);
-      // Fallback auto-provision if needed
-      try {
-        await register(demoEmail, 'Password123!');
-        toast.success('Authentication Successful', `Provisioned and signed in as ${demoEmail}`);
-        navigate('/dashboard');
-      } catch (regErr: any) {
-        setErrorMsg(err.message || 'Sign in failed');
-        toast.error('Authentication Failed', err.message);
-      }
+      setErrorMsg(err.message || 'Sign in failed. Check credentials.');
+      toast.error('Authentication Failed', err.message);
     } finally {
       setIsLoading(false);
     }
@@ -165,18 +158,18 @@ export const LoginPage: React.FC = () => {
             <div className="flex items-center gap-2 text-xs text-indigo-200">
               <Zap className="w-4 h-4 text-amber-400 shrink-0" />
               <div>
-                <span className="font-semibold text-white">Instant Demo Access</span>
-                <p className="text-[11px] text-slate-400">One-click login with verified Admin role</p>
+                <span className="font-semibold text-white">Instant Admin Access</span>
+                <p className="text-[11px] text-slate-400">One-click login with verified Admin account</p>
               </div>
             </div>
             <button
               id="instant-demo-login-btn"
               type="button"
               disabled={isLoading || isRegistering}
-              onClick={() => handleDirectSignIn('admin_demo@iims.com', 'ADMIN')}
+              onClick={() => handleDirectSignIn('admin@iims.com', 'Admin@123', 'ADMIN')}
               className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow transition-all shrink-0 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
             >
-              {isLoading && email === 'admin_demo@iims.com' ? (
+              {isLoading && email === 'admin@iims.com' ? (
                 <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
@@ -228,7 +221,7 @@ export const LoginPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin_demo@iims.com"
+                  placeholder="admin@iims.com"
                   className="w-full pl-9 pr-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
                 />
               </div>
@@ -318,21 +311,21 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              {/* Admin Demo */}
+              {/* Real Admin Account */}
               <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition-colors">
                 <div className="min-w-0 flex-1 mr-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-white truncate font-mono">admin_demo@iims.com</span>
+                    <span className="text-xs font-medium text-white truncate font-mono">admin@iims.com</span>
                     <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
                       ADMIN
                     </span>
                   </div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Password: Password123!</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5 font-mono">Password: Admin@123</div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     type="button"
-                    onClick={() => handleQuickFill('admin_demo@iims.com', 'ADMIN')}
+                    onClick={() => handleQuickFill('admin@iims.com', 'Admin@123', 'ADMIN')}
                     className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg transition-colors cursor-pointer"
                   >
                     Fill
@@ -340,7 +333,7 @@ export const LoginPage: React.FC = () => {
                   <button
                     type="button"
                     disabled={isLoading || isRegistering}
-                    onClick={() => handleDirectSignIn('admin_demo@iims.com', 'ADMIN')}
+                    onClick={() => handleDirectSignIn('admin@iims.com', 'Admin@123', 'ADMIN')}
                     className="px-2.5 py-1 bg-indigo-600/80 hover:bg-indigo-600 text-white text-[11px] font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-1"
                   >
                     <Zap className="w-3 h-3 text-amber-300" /> Sign In
@@ -348,7 +341,37 @@ export const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Engineer Demo */}
+              {/* Real User Account */}
+              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition-colors">
+                <div className="min-w-0 flex-1 mr-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-medium text-white truncate font-mono">admin@test.com</span>
+                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                      USER
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-0.5 font-mono">Password: password123</div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill('admin@test.com', 'password123', 'USER')}
+                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg transition-colors cursor-pointer"
+                  >
+                    Fill
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isLoading || isRegistering}
+                    onClick={() => handleDirectSignIn('admin@test.com', 'password123', 'USER')}
+                    className="px-2.5 py-1 bg-emerald-600/80 hover:bg-emerald-600 text-white text-[11px] font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <Zap className="w-3 h-3 text-emerald-200" /> Sign In
+                  </button>
+                </div>
+              </div>
+
+              {/* Real Engineer Account */}
               <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition-colors">
                 <div className="min-w-0 flex-1 mr-2">
                   <div className="flex items-center gap-1.5">
@@ -357,12 +380,12 @@ export const LoginPage: React.FC = () => {
                       ENGINEER
                     </span>
                   </div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Password: Password123!</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5 font-mono">Password: Password123!</div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     type="button"
-                    onClick={() => handleQuickFill('engineer_demo@iims.com', 'ENGINEER')}
+                    onClick={() => handleQuickFill('engineer_demo@iims.com', 'Password123!', 'ENGINEER')}
                     className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg transition-colors cursor-pointer"
                   >
                     Fill
@@ -370,70 +393,10 @@ export const LoginPage: React.FC = () => {
                   <button
                     type="button"
                     disabled={isLoading || isRegistering}
-                    onClick={() => handleDirectSignIn('engineer_demo@iims.com', 'ENGINEER')}
+                    onClick={() => handleDirectSignIn('engineer_demo@iims.com', 'Password123!', 'ENGINEER')}
                     className="px-2.5 py-1 bg-sky-600/80 hover:bg-sky-600 text-white text-[11px] font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-1"
                   >
                     <Zap className="w-3 h-3 text-sky-200" /> Sign In
-                  </button>
-                </div>
-              </div>
-
-              {/* User Demo */}
-              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition-colors">
-                <div className="min-w-0 flex-1 mr-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-white truncate font-mono">operator_demo@iims.com</span>
-                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-500/30">
-                      USER
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Password: Password123!</div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('operator_demo@iims.com', 'USER')}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg transition-colors cursor-pointer"
-                  >
-                    Fill
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isLoading || isRegistering}
-                    onClick={() => handleDirectSignIn('operator_demo@iims.com', 'USER')}
-                    className="px-2.5 py-1 bg-emerald-600/80 hover:bg-emerald-600 text-white text-[11px] font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-1"
-                  >
-                    <Zap className="w-3 h-3 text-emerald-200" /> Sign In
-                  </button>
-                </div>
-              </div>
-
-              {/* User email from metadata */}
-              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition-colors">
-                <div className="min-w-0 flex-1 mr-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-white truncate font-mono">binoy12131415@gmail.com</span>
-                    <span className="text-[10px] font-bold text-purple-400 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/30">
-                      YOU
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Password: Password123!</div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('binoy12131415@gmail.com', 'ADMIN')}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg transition-colors cursor-pointer"
-                  >
-                    Fill
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isLoading || isRegistering}
-                    onClick={() => handleDirectSignIn('binoy12131415@gmail.com', 'ADMIN')}
-                    className="px-2.5 py-1 bg-purple-600/80 hover:bg-purple-600 text-white text-[11px] font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-1"
-                  >
-                    <Zap className="w-3 h-3 text-purple-200" /> Sign In
                   </button>
                 </div>
               </div>

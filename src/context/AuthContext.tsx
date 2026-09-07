@@ -24,6 +24,14 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export const inferRoleFromEmail = (email: string): UserRole => {
+  const lower = email.toLowerCase().trim();
+  if (lower === 'admin@test.com') return 'USER';
+  if (lower.includes('engineer')) return 'ENGINEER';
+  if (lower.includes('admin')) return 'ADMIN';
+  return 'USER';
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -72,12 +80,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }
           if (!parsedUser) {
+            const resolvedRole = (decoded.role as UserRole) || inferRoleFromEmail(decoded.sub);
             const newUser: User = {
               email: decoded.sub,
-              role: (decoded.role as UserRole) || activeRole,
+              role: resolvedRole,
             };
             setUser(newUser);
+            setActiveRoleState(resolvedRole);
             localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+            localStorage.setItem(ROLE_OVERRIDE_KEY, resolvedRole);
+          } else {
+            setActiveRoleState(parsedUser.role);
           }
         }
       }
@@ -120,7 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const decoded = decodeJwt(jwt);
       const userEmail = decoded?.sub || email;
-      const targetRole = preferredRole || activeRole;
+      const targetRole = preferredRole || (decoded?.role as UserRole) || inferRoleFromEmail(userEmail);
 
       setActiveRoleState(targetRole);
       localStorage.setItem(ROLE_OVERRIDE_KEY, targetRole);
@@ -133,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(newUser);
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
     },
-    [activeRole]
+    []
   );
 
   const register = useCallback(

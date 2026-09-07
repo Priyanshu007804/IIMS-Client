@@ -102,7 +102,7 @@ export const AssignEngineerModal: React.FC<AssignEngineerModalProps> = ({
         <div>
           <div className="text-[11px] text-slate-400 mb-1.5">Quick team suggestions:</div>
           <div className="flex flex-wrap gap-1.5">
-            {['engineer@iims.com', 'devops@iims.com', 'sre-oncall@iims.com'].map((email) => (
+            {['engineer_demo@iims.com', 'devops@iims.com', 'sre-oncall@iims.com'].map((email) => (
               <button
                 key={email}
                 type="button"
