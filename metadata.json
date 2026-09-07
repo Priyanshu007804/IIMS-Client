@@ -1,0 +1,6 @@
+{
+  "name": "Intelligent Incident & Service Management Platform (IIMS)",
+  "description": "Enterprise IT incident management platform integrated with real-time Spring Boot backend, JWT authentication, role-based workflows, and analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
